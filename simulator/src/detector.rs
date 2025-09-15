@@ -1,4 +1,5 @@
 use engine::{Bounds, particle::Particle};
+use rayon::iter::{IndexedParallelIterator, IntoParallelRefIterator, ParallelIterator};
 
 use crate::{
     solver::{Collision, Toi},
@@ -27,29 +28,35 @@ impl Detector for CellListDetector {
         bounds: &Bounds,
         dt: f32,
     ) -> Option<Toi> {
-        let mut min_toi = None;
+        particles
+            .par_iter()
+            .enumerate()
+            .filter_map(|(i, p)| {
+                let mut min_toi = None;
+                let mut dt_i = dt;
 
-        for (i, p) in particles.iter().enumerate() {
-            for j in grid.cell_list(p) {
-                if j <= i {
-                    continue;
+                for j in grid.cell_list(p) {
+                    if j <= i {
+                        continue;
+                    }
+
+                    if let Some(t) = p2p_toi(p, &particles[j], dt_i)
+                        && !min_toi.is_some_and(|toi: Toi| t >= toi.time)
+                    {
+                        dt_i = t;
+                        min_toi = Some(Toi::from((t, Collision::Pair(i, j))));
+                    }
                 }
 
-                if let Some(t) = p2p_toi(p, &particles[j], dt)
+                if let Some(t) = boundary_toi(p, bounds, dt_i)
                     && !min_toi.is_some_and(|toi: Toi| t >= toi.time)
                 {
-                    min_toi = Some(Toi::from((t, Collision::Pair(i, j))));
+                    min_toi = Some(Toi::from((t, Collision::Wall(i))));
                 }
-            }
 
-            if let Some(t) = boundary_toi(p, bounds, dt)
-                && !min_toi.is_some_and(|toi: Toi| t >= toi.time)
-            {
-                min_toi = Some(Toi::from((t, Collision::Wall(i))));
-            }
-        }
-
-        min_toi
+                min_toi
+            })
+            .min_by(|a, b| a.time.partial_cmp(&b.time).unwrap())
     }
 }
 
@@ -61,29 +68,37 @@ impl Detector for TccdDetector {
         bounds: &Bounds,
         dt: f32,
     ) -> Option<Toi> {
-        let mut min_toi = None;
+        particles
+            .par_iter()
+            .enumerate()
+            .with_min_len(64)
+            .filter_map(|(i, p1)| {
+                let mut min_toi = None;
+                let mut dt_i = dt;
 
-        for (i, p1) in particles.iter().enumerate() {
-            for j in grid.candidates_along_sweep_with_radius(particles, i, dt) {
-                if j <= i {
-                    continue;
+                for j in grid.candidates_along_sweep_with_radius(particles, i, dt_i) {
+                    if j <= i {
+                        continue;
+                    }
+
+                    if let Some(t) = p2p_toi(p1, &particles[j], dt_i)
+                        && !min_toi.is_some_and(|toi: Toi| t >= toi.time)
+                    {
+                        dt_i = t;
+                        min_toi = Some(Toi::from((t, Collision::Pair(i, j))));
+                    }
                 }
 
-                if let Some(t) = p2p_toi(p1, &particles[j], dt)
+                if dt_i > 0.0
+                    && let Some(t) = boundary_toi(p1, bounds, dt_i)
                     && !min_toi.is_some_and(|toi: Toi| t >= toi.time)
                 {
-                    min_toi = Some(Toi::from((t, Collision::Pair(i, j))));
+                    min_toi = Some(Toi::from((t, Collision::Wall(i))));
                 }
-            }
 
-            if let Some(t) = boundary_toi(p1, bounds, dt)
-                && !min_toi.is_some_and(|toi: Toi| t >= toi.time)
-            {
-                min_toi = Some(Toi::from((t, Collision::Wall(i))));
-            }
-        }
-
-        min_toi
+                min_toi
+            })
+            .min_by(|a, b| a.time.partial_cmp(&b.time).unwrap())
     }
 }
 
@@ -95,29 +110,36 @@ impl Detector for SweptAabbDetector {
         bounds: &Bounds,
         dt: f32,
     ) -> Option<Toi> {
-        let mut min_toi = None;
+        particles
+            .par_iter()
+            .enumerate()
+            .with_min_len(64)
+            .filter_map(|(i, p1)| {
+                let mut min_toi = None;
+                let mut dt_i = dt;
 
-        for (i, p1) in particles.iter().enumerate() {
-            for j in grid.candidates_swept_aabb(particles, i, dt) {
-                if j <= i {
-                    continue;
+                for j in grid.candidates_swept_aabb(particles, i, dt_i) {
+                    if j <= i {
+                        continue;
+                    }
+
+                    if let Some(t) = p2p_toi(p1, &particles[j], dt_i)
+                        && !min_toi.is_some_and(|toi: Toi| t >= toi.time)
+                    {
+                        dt_i = t;
+                        min_toi = Some(Toi::from((t, Collision::Pair(i, j))));
+                    }
                 }
 
-                if let Some(t) = p2p_toi(p1, &particles[j], dt)
+                if let Some(t) = boundary_toi(p1, bounds, dt_i)
                     && !min_toi.is_some_and(|toi: Toi| t >= toi.time)
                 {
-                    min_toi = Some(Toi::from((t, Collision::Pair(i, j))));
+                    min_toi = Some(Toi::from((t, Collision::Wall(i))));
                 }
-            }
 
-            if let Some(t) = boundary_toi(p1, bounds, dt)
-                && !min_toi.is_some_and(|toi: Toi| t >= toi.time)
-            {
-                min_toi = Some(Toi::from((t, Collision::Wall(i))));
-            }
-        }
-
-        min_toi
+                min_toi
+            })
+            .min_by(|a, b| a.time.partial_cmp(&b.time).unwrap())
     }
 }
 

@@ -8,6 +8,7 @@ use clap::Parser;
 use engine::{Bounds, Simulation, SimulationConfig, particle::Particle};
 use glam::Vec2;
 use rand::{Rng, SeedableRng, rngs::StdRng};
+use rayon::ThreadPoolBuilder;
 
 use crate::{cli::Cli, solver::Solver};
 
@@ -69,6 +70,11 @@ fn main() -> anyhow::Result<()> {
     env_logger::init();
 
     let cli = Cli::parse();
+
+    ThreadPoolBuilder::new()
+        .num_threads(num_cpus::get().saturating_sub(4).max(1))
+        .build_global()
+        .unwrap();
 
     engine::run_with(
         TCcdSim {
