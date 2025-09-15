@@ -21,7 +21,7 @@ pub enum RecorderType {
 
 #[derive(Debug, Clone, Copy, ValueEnum)]
 pub enum DetectionType {
-    Aabb,
+    CellList,
     Tccd,
     SweptAabb,
 }
@@ -29,7 +29,7 @@ pub enum DetectionType {
 impl DetectionType {
     fn tag(&self) -> &'static str {
         match self {
-            DetectionType::Aabb => "aabb",
+            DetectionType::CellList => "cell_list",
             DetectionType::Tccd => "tccd",
             DetectionType::SweptAabb => "swept_aabb",
         }

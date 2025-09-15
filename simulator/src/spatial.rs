@@ -39,7 +39,7 @@ impl SpatialGrid {
         }
     }
 
-    pub fn neighbors<'a>(&'a self, p: &Particle) -> impl Iterator<Item = usize> + 'a {
+    pub fn cell_list<'a>(&'a self, p: &Particle) -> impl Iterator<Item = usize> + 'a {
         let base = self.cell_coord(p.position);
 
         Self::DIRS.into_iter().flat_map(move |d| {
