@@ -1,7 +1,8 @@
-use engine::{Bounds, particle::Particle};
+use engine::Bounds;
 use rayon::iter::{IndexedParallelIterator, IntoParallelRefIterator, ParallelIterator};
 
 use crate::{
+    particle::Particle,
     solver::{Collision, Toi},
     spatial::SpatialGrid,
 };

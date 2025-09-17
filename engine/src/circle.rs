@@ -7,21 +7,17 @@ pub const MAX_INSTANCES: usize = 50_000;
 
 #[repr(C)]
 #[derive(Default, Copy, Clone, Debug)]
-pub struct Particle {
+pub struct Circle {
     pub position: Vec2,
-    pub velocity: Vec2,
     pub radius: f32,
-    pub mass: f32,
     pub color: [f32; 3],
 }
 
-impl Particle {
-    pub fn new(position: Vec2, velocity: Vec2, radius: f32, mass: f32, color: [f32; 3]) -> Self {
+impl Circle {
+    pub fn new(position: Vec2, radius: f32, color: [f32; 3]) -> Self {
         Self {
             position,
-            velocity,
             radius,
-            mass,
             color,
         }
     }
@@ -35,6 +31,18 @@ pub struct InstanceRaw {
     pub _pad0: f32,
     pub color: [f32; 3],
     pub _pad1: f32,
+}
+
+impl From<Circle> for InstanceRaw {
+    fn from(c: Circle) -> Self {
+        Self {
+            pos: [c.position.x, c.position.y],
+            radius: c.radius,
+            _pad0: 0.0,
+            color: c.color,
+            _pad1: 0.0,
+        }
+    }
 }
 
 impl InstanceRaw {
@@ -61,16 +69,6 @@ impl InstanceRaw {
                     format: VertexFormat::Float32x3,
                 },
             ],
-        }
-    }
-
-    pub fn from_particle(p: &Particle) -> Self {
-        Self {
-            pos: [p.position.x, p.position.y],
-            radius: p.radius,
-            _pad0: 0.0,
-            color: p.color,
-            _pad1: 0.0,
         }
     }
 }

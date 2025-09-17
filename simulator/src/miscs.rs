@@ -1,8 +1,9 @@
 use std::{fs::File, io::BufWriter};
 
 use clap::ValueEnum;
-use engine::particle::Particle;
 use serde::Serialize;
+
+use crate::particle::Particle;
 
 pub struct Recorder {
     pub frame: u64,

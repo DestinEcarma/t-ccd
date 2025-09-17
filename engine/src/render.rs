@@ -5,8 +5,8 @@ use wgpu::util::{BufferInitDescriptor, DeviceExt};
 use wgpu::*;
 use winit::{dpi::PhysicalSize, window::Window};
 
+use crate::circle::{Circle, InstanceRaw, MAX_INSTANCES};
 use crate::mesh::{QUAD_INDICES, QUAD_VERTICES, QuadVertex};
-use crate::particle::{InstanceRaw, MAX_INSTANCES, Particle};
 
 #[repr(C)]
 #[derive(Copy, Clone, Debug, bytemuck::Pod, bytemuck::Zeroable)]
@@ -219,13 +219,17 @@ impl Renderer {
             .write_buffer(&self.globals_buffer, 0, bytemuck::bytes_of(&globals));
     }
 
-    pub fn upload_instances(&mut self, particles: &[Particle]) {
-        self.num_instances = particles.len().min(MAX_INSTANCES);
-
-        let data = particles
+    pub fn upload_instances<C>(&mut self, instances: &[C])
+    where
+        C: Into<Circle> + Copy,
+    {
+        let data = instances
             .iter()
-            .map(InstanceRaw::from_particle)
+            .take(MAX_INSTANCES)
+            .map(|c| InstanceRaw::from((*c).into()))
             .collect::<Vec<InstanceRaw>>();
+
+        self.num_instances = data.len();
 
         self.queue.write_buffer(
             &self.instance_buffer,

@@ -1,4 +1,4 @@
-pub mod particle;
+pub mod circle;
 
 mod mesh;
 mod render;
@@ -17,7 +17,7 @@ use winit::{
     window::{Fullscreen, Window, WindowAttributes, WindowId},
 };
 
-use crate::{particle::Particle, render::Renderer};
+use crate::{circle::Circle, render::Renderer};
 
 pub struct Bounds {
     pub width: f32,
@@ -36,9 +36,11 @@ pub struct SimulationConfig {
 }
 
 pub trait Simulation {
+    type Instance: Into<Circle> + Copy;
+
     fn init(&mut self, bounds: Bounds);
     fn step(&mut self, dt: f32, bounds: Bounds);
-    fn particles(&self) -> &[Particle];
+    fn instances(&self) -> &[Self::Instance];
 }
 
 pub fn run_with<S: Simulation + 'static>(sim: S, config: SimulationConfig) -> anyhow::Result<()> {
@@ -87,7 +89,7 @@ pub fn run_with<S: Simulation + 'static>(sim: S, config: SimulationConfig) -> an
                     height: size.height as f32,
                 });
 
-                renderer.upload_instances(self.simulation.particles());
+                renderer.upload_instances(self.simulation.instances());
 
                 self.window = Some(window.clone());
                 self.renderer = Some(renderer);
@@ -143,7 +145,7 @@ pub fn run_with<S: Simulation + 'static>(sim: S, config: SimulationConfig) -> an
                         self.simulation.step(dt, bounds);
                     }
 
-                    renderer.upload_instances(self.simulation.particles());
+                    renderer.upload_instances(self.simulation.instances());
 
                     if let Err(err) = renderer.render() {
                         use wgpu::SurfaceError::*;
@@ -189,7 +191,6 @@ pub fn run_with<S: Simulation + 'static>(sim: S, config: SimulationConfig) -> an
         config,
     };
 
-    event_loop.set_control_flow(ControlFlow::Poll);
     event_loop.run_app(&mut app)?;
 
     Ok(())

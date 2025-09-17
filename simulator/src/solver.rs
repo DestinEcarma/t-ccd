@@ -1,9 +1,10 @@
-use engine::{Bounds, particle::Particle};
+use engine::Bounds;
 use glam::Vec2;
 
 use crate::{
     detector::{CellListDetector, Detector, SweptAabbDetector, TccdDetector},
     miscs::{DetectionType, Recorder, RecorderType},
+    particle::Particle,
     spatial::SpatialGrid,
 };
 

@@ -1,6 +1,7 @@
-use engine::particle::Particle;
 use glam::{IVec2, Vec2};
 use std::collections::HashMap;
+
+use crate::particle::Particle;
 
 pub struct SpatialGrid {
     cell_size: f32,

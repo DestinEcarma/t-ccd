@@ -1,16 +1,17 @@
 mod cli;
 mod detector;
 mod miscs;
+mod particle;
 mod solver;
 mod spatial;
 
 use clap::Parser;
-use engine::{Bounds, Simulation, SimulationConfig, particle::Particle};
+use engine::{Bounds, Simulation, SimulationConfig};
 use glam::Vec2;
 use rand::{Rng, SeedableRng, rngs::StdRng};
 use rayon::ThreadPoolBuilder;
 
-use crate::{cli::Cli, solver::Solver};
+use crate::{cli::Cli, particle::Particle, solver::Solver};
 
 const SPEED: f32 = 500.0;
 
@@ -22,6 +23,8 @@ struct TCcdSim {
 }
 
 impl Simulation for TCcdSim {
+    type Instance = Particle;
+
     fn init(&mut self, bounds: Bounds) {
         let (hw, hh) = bounds.half_extents();
         let mut rng = if let Some(seed) = self._seed {
@@ -61,7 +64,7 @@ impl Simulation for TCcdSim {
         self.solver.recorder.flush();
     }
 
-    fn particles(&self) -> &[Particle] {
+    fn instances(&self) -> &[Self::Instance] {
         &self.particles
     }
 }
