@@ -30,6 +30,6 @@ pub struct Cli {
     pub fps: u64,
 
     /// Open in fullscreen mode
-    #[arg(long, default_value_t = false)]
+    #[arg(short = 'F', long, default_value_t = false)]
     pub fullscreen: bool,
 }
