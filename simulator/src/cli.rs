@@ -32,4 +32,12 @@ pub struct Cli {
     /// Open in fullscreen mode
     #[arg(short = 'F', long, default_value_t = false)]
     pub fullscreen: bool,
+
+    /// Min radius of particles
+    #[arg(short, long, default_value_t = 3.0)]
+    pub min_radius: f32,
+
+    /// Max radius of particles
+    #[arg(short = 'M', long, default_value_t = 10.0)]
+    pub max_radius: f32,
 }

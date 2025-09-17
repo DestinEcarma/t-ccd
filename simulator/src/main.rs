@@ -20,6 +20,8 @@ struct TCcdSim {
     solver: Solver,
 
     _seed: Option<u64>,
+    _min_radius: f32,
+    _max_radius: f32,
 }
 
 impl Simulation for TCcdSim {
@@ -42,7 +44,13 @@ impl Simulation for TCcdSim {
                 rng.random_range(-SPEED..SPEED),
                 rng.random_range(-SPEED..SPEED),
             );
-            p.radius = rng.random_range(3.0..7.0);
+
+            if (self._max_radius - self._min_radius).abs() < f32::EPSILON {
+                p.radius = self._min_radius;
+            } else {
+                p.radius = rng.random_range(self._min_radius..self._max_radius);
+            }
+
             p.mass = std::f32::consts::PI * p.radius * p.radius;
             p.color = [rng.random(), rng.random(), rng.random()];
         });
@@ -79,12 +87,24 @@ fn main() -> anyhow::Result<()> {
         .build_global()
         .unwrap();
 
+    if cli.min_radius > cli.max_radius {
+        log::error!("Min radius cannot be greater than max radius");
+        return Ok(());
+    }
+
+    if cli.min_radius < 1.0 || cli.max_radius < 1.0 {
+        log::error!("Radii must be at least 1.0");
+        return Ok(());
+    }
+
     engine::run_with(
         TCcdSim {
             particles: vec![Particle::default(); cli.particle_count as usize],
             solver: Solver::new(cli.cell_size, cli.record, cli.method, cli.particle_count),
 
             _seed: cli.seed,
+            _min_radius: cli.min_radius,
+            _max_radius: cli.max_radius,
         },
         SimulationConfig {
             fullscreen: cli.fullscreen,
