@@ -39,7 +39,7 @@ impl From<Circle> for InstanceRaw {
             pos: [c.position.x, c.position.y],
             radius: c.radius,
             _pad0: 0.0,
-            color: c.color,
+            color: Self::hsl_to_rgb(c.color[0], c.color[1], c.color[2]),
             _pad1: 0.0,
         }
     }
@@ -70,5 +70,17 @@ impl InstanceRaw {
                 },
             ],
         }
+    }
+
+    #[inline]
+    pub fn hsl_to_rgb(h: f32, s: f32, l: f32) -> [f32; 3] {
+        let a = s * l.min(1.0 - l);
+
+        let f = |n: f32| {
+            let k = (n + h * 12.0) % 12.0;
+            l - a * (-1.0f32).max((k - 3.0).min(9.0 - k).min(1.0))
+        };
+
+        [f(0.0), f(8.0), f(4.0)]
     }
 }

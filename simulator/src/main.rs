@@ -52,7 +52,7 @@ impl Simulation for TCcdSim {
             }
 
             p.mass = std::f32::consts::PI * p.radius * p.radius;
-            p.color = [rng.random(), rng.random(), rng.random()];
+            p.color = [rng.random(), 1.0, 0.5];
         });
 
         self.solver.recorder.frame += 1;
