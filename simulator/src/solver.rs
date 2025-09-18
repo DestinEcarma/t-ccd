@@ -2,7 +2,7 @@ use engine::{Bounds, particle::Particle};
 use glam::Vec2;
 
 use crate::{
-    detector::{AabbDetector, Detector, SweptAabbDetector, TccdDetector},
+    detector::{CellListDetector, Detector, SweptAabbDetector, TccdDetector},
     miscs::{DetectionType, Recorder, RecorderType},
     spatial::SpatialGrid,
 };
@@ -49,7 +49,7 @@ impl Solver {
             grid: SpatialGrid::new(cell_size),
             recorder: Recorder::new(r_type, d_type, particle_count),
             detector: match d_type {
-                DetectionType::Aabb => Box::new(AabbDetector),
+                DetectionType::CellList => Box::new(CellListDetector),
                 DetectionType::Tccd => Box::new(TccdDetector),
                 DetectionType::SweptAabb => Box::new(SweptAabbDetector),
             },

@@ -15,11 +15,11 @@ pub trait Detector {
     ) -> Option<Toi>;
 }
 
-pub struct AabbDetector;
+pub struct CellListDetector;
 pub struct TccdDetector;
 pub struct SweptAabbDetector;
 
-impl Detector for AabbDetector {
+impl Detector for CellListDetector {
     fn find_min_toi(
         &mut self,
         grid: &mut SpatialGrid,
@@ -30,7 +30,7 @@ impl Detector for AabbDetector {
         let mut min_toi = None;
 
         for (i, p) in particles.iter().enumerate() {
-            for j in grid.neighbors(p) {
+            for j in grid.cell_list(p) {
                 if j <= i {
                     continue;
                 }
