@@ -38,7 +38,7 @@ impl Renderer {
         PhysicalSize { width, height }: PhysicalSize<u32>,
     ) -> anyhow::Result<Self> {
         let instance = Instance::new(&InstanceDescriptor {
-            backends: wgpu::Backends::VULKAN,
+            backends: wgpu::Backends::VULKAN | wgpu::Backends::METAL | wgpu::Backends::DX12,
             ..Default::default()
         });
         let surface = instance.create_surface(window)?;
