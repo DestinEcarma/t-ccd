@@ -11,13 +11,15 @@ pub struct Recorder {
 
     particles_csv: Option<CsvSink>,
     events_csv: Option<CsvSink>,
+    checks_csv: Option<CsvSink>,
 }
 
 #[derive(Debug, Clone, Copy, ValueEnum)]
 pub enum RecorderType {
     Snapshots,
     Events,
-    Both,
+    Checks,
+    All,
 }
 
 #[derive(Debug, Clone, Copy, ValueEnum)]
@@ -43,12 +45,13 @@ impl DetectionType {
 
 impl Recorder {
     pub fn new(r_type: Option<RecorderType>, d_type: DetectionType, particle_count: u64) -> Self {
-        let (particles_csv, events_csv) = match r_type {
-            None => (None, None),
+        let (particles_csv, events_csv, checks_csv) = match r_type {
+            None => (None, None, None),
             Some(r) => {
                 let tag = d_type.tag();
-                let has_particles = matches!(r, RecorderType::Snapshots | RecorderType::Both);
-                let has_events = matches!(r, RecorderType::Events | RecorderType::Both);
+                let has_particles = matches!(r, RecorderType::Snapshots | RecorderType::All);
+                let has_events = matches!(r, RecorderType::Events | RecorderType::All);
+                let has_checks = matches!(r, RecorderType::Checks | RecorderType::All);
 
                 let p = if has_particles {
                     Some(DetectionType::make_sink("particles", tag, particle_count))
@@ -61,14 +64,23 @@ impl Recorder {
                     None
                 };
 
-                (p, e)
+                let c = if has_checks {
+                    Some(DetectionType::make_sink("checks", tag, particle_count))
+                } else {
+                    None
+                };
+
+                (p, e, c)
             }
         };
+
         Self {
             frame: 0,
             time_s: 0.0,
+
             particles_csv,
             events_csv,
+            checks_csv,
         }
     }
 
@@ -135,12 +147,32 @@ impl Recorder {
         }
     }
 
-    pub fn flush(&mut self) {
-        if self.frame % 60 == 0
-            && let (Some(pw), Some(ew)) = (&mut self.particles_csv, &mut self.events_csv)
+    pub fn write_check(&mut self, iter: usize, count: u64) {
+        if let Some(cw) = &mut self.checks_csv
+            && let Err(e) = cw.writer_mut().serialize(CheckRow {
+                frame: self.frame,
+                time_s: self.time_s,
+                count,
+                iter,
+            })
         {
-            pw.flush();
-            ew.flush();
+            log::error!("Failed to write check row: {}", e);
+        }
+    }
+
+    pub fn flush(&mut self) {
+        if self.frame % 60 == 0 {
+            if let Some(pw) = &mut self.particles_csv {
+                pw.flush();
+            }
+
+            if let Some(ew) = &mut self.events_csv {
+                ew.flush();
+            }
+
+            if let Some(cw) = &mut self.checks_csv {
+                cw.flush();
+            }
         };
     }
 }
@@ -208,4 +240,12 @@ pub enum EventRow {
         vn_before: f32,
         vn_after: f32,
     },
+}
+
+#[derive(Serialize)]
+pub struct CheckRow {
+    pub frame: u64,
+    pub time_s: f32,
+    pub iter: usize,
+    pub count: u64,
 }

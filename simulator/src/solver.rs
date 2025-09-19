@@ -58,7 +58,7 @@ impl Solver {
     }
 
     pub fn solve(&mut self, particles: &mut [Particle], bounds: &Bounds, mut dt: f32) {
-        for _ in 0..MAX_ITER {
+        for i in 0..MAX_ITER {
             if dt <= EPS_T {
                 Self::advance_all(particles, dt);
                 break;
@@ -71,11 +71,13 @@ impl Solver {
                 .find_min_toi(&mut self.grid, particles, bounds, dt);
 
             match min_toi {
-                Some(toi) => {
+                Some((toi, checks)) => {
                     Self::advance_all(particles, toi.time);
                     self.resolve_collision(particles, bounds, toi);
 
                     dt -= toi.time;
+
+                    self.recorder.write_check(i, checks);
                 }
                 None => {
                     Self::advance_all(particles, dt);
