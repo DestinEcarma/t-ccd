@@ -30,6 +30,10 @@ impl SpatialGrid {
         }
     }
 
+    pub fn set_max_radius(&mut self, r: f32) {
+        self.r_max = r;
+    }
+
     pub fn rebuild(&mut self, particles: &[Particle]) {
         self.cells.clear();
 

@@ -11,7 +11,7 @@ use glam::Vec2;
 use rand::{Rng, SeedableRng, rngs::StdRng};
 use rayon::ThreadPoolBuilder;
 
-use crate::{cli::Cli, particle::Particle, solver::Solver};
+use crate::{cli::Cli, miscs::DetectionType, particle::Particle, solver::Solver};
 
 const SPEED: f32 = 500.0;
 
@@ -55,6 +55,8 @@ impl Simulation for TCcdSim {
             p.color = [rng.random(), 1.0, 0.5];
         });
 
+        self.solver.set_max_radius(self._max_radius);
+
         self.solver.recorder.frame += 1;
         self.solver
             .recorder
@@ -80,7 +82,7 @@ impl Simulation for TCcdSim {
 fn main() -> anyhow::Result<()> {
     env_logger::init();
 
-    let cli = Cli::parse();
+    let mut cli = Cli::parse();
 
     ThreadPoolBuilder::new()
         .num_threads(num_cpus::get().saturating_sub(4).max(1))
@@ -95,6 +97,24 @@ fn main() -> anyhow::Result<()> {
     if cli.min_radius < 1.0 || cli.max_radius < 1.0 {
         log::error!("Radii must be at least 1.0");
         return Ok(());
+    }
+
+    match cli.method {
+        DetectionType::CellList => {
+            if cli.max_radius * 2.0 > cli.cell_size {
+                cli.cell_size = cli.max_radius * 2.0;
+
+                log::warn!(
+                    "Cell size is too small for the maximum particle radius, which may lead to missed collisions."
+                );
+                log::warn!("Cell size has been adjusted to {}", cli.cell_size);
+            }
+        }
+        DetectionType::Tccd | DetectionType::SweptAabb => {
+            if cli.cell_size < 1.0 {
+                log::warn!("Cell size is too small, which may lead to performance issues.");
+            }
+        }
     }
 
     engine::run_with(

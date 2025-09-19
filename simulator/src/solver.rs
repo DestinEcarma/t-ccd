@@ -89,6 +89,10 @@ impl Solver {
         Self::clamp_particles(particles, bounds);
     }
 
+    pub fn set_max_radius(&mut self, r: f32) {
+        self.grid.set_max_radius(r);
+    }
+
     fn resolve_collision(&mut self, particles: &mut [Particle], bounds: &Bounds, toi: Toi) {
         match toi.collision {
             Collision::Pair(i, j) => {
