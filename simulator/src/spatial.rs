@@ -1,6 +1,7 @@
-use engine::particle::Particle;
 use glam::{IVec2, Vec2};
 use std::collections::HashMap;
+
+use crate::particle::Particle;
 
 pub struct SpatialGrid {
     cell_size: f32,
@@ -27,6 +28,10 @@ impl SpatialGrid {
             cells: HashMap::new(),
             r_max: 0.0,
         }
+    }
+
+    pub fn set_max_radius(&mut self, r: f32) {
+        self.r_max = r;
     }
 
     pub fn rebuild(&mut self, particles: &[Particle]) {
@@ -225,21 +230,19 @@ impl Iterator for GridRayIter {
             return None;
         }
 
-        // Emit current cell first
         let out = self.cur;
 
-        // If no time remains, finish after emitting this cell
         if self.t_remain <= 0.0 || (self.t_max.x.is_infinite() && self.t_max.y.is_infinite()) {
             self.done = true;
             return Some(out);
         }
 
-        // Step to next cell along the cheapest axis
         if self.t_max.x < self.t_max.y {
             if self.t_max.x > self.t_remain {
                 self.done = true;
                 return Some(out);
             }
+
             self.cur.x += self.step.x;
             self.t_max.x += self.t_delta.x;
         } else {
@@ -247,6 +250,7 @@ impl Iterator for GridRayIter {
                 self.done = true;
                 return Some(out);
             }
+
             self.cur.y += self.step.y;
             self.t_max.y += self.t_delta.y;
         }
