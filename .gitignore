@@ -1,5 +1,70 @@
-target
-.vscode
-.cargo
+# Rust build artifacts
+target/
+.cargo/
 
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Python artifacts
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# Data files (keep samples, ignore large datasets)
 *.csv
+!*_sample.csv
+
+# Validation output
+analysis/brute_force_validation/
+*.log
+
+# Temporary files
+*.tmp
+*.bak
+*~
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# pytest
+.pytest_cache/
+
+# uv
+.python-version
