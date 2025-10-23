@@ -4,8 +4,8 @@ from typing import Dict, List, Tuple
 
 import pandas as pd
 
-from ..config import chunk_size
-from ..models import Particle
+from .config import chunk_size
+from .models import Particle
 
 
 class DataLoader:

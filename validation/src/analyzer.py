@@ -3,7 +3,8 @@
 from typing import Dict, List, Set, Tuple
 
 import pandas as pd
-from ..models import Collision
+
+from .models import Collision
 
 
 class AccuracyAnalyzer:

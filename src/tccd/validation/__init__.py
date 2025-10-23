@@ -1,1 +1,0 @@
-"""Validation subpackage for T-CCD collision detection validation."""

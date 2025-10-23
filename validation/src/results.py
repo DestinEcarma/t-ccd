@@ -6,8 +6,8 @@ from typing import Dict, List, Optional
 
 import pandas as pd
 
-from ..config import output_dir
-from ..models import Collision
+from .config import output_dir
+from .models import Collision
 
 
 class ResultsManager:

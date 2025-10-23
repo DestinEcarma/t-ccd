@@ -1,1 +1,0 @@
-"""Analysis subpackage for T-CCD statistical analysis."""

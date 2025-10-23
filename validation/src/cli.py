@@ -4,10 +4,10 @@ import argparse
 import sys
 
 from .config import max_frames, time_step 
-from .validation.validator import BruteForceValidator
+from .validator import BruteForceValidator
 
 
-def main():
+def cli():
     """Main entry point for T-CCD validation CLI."""
     parser = argparse.ArgumentParser(
         description="T-CCD: Brute Force Collision Detection Validator"
@@ -108,7 +108,3 @@ def main():
         import traceback
         traceback.print_exc()
         sys.exit(1)
-
-
-if __name__ == "__main__":
-    main()

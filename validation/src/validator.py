@@ -2,17 +2,16 @@
 
 
 import time
-from datetime import datetime
 from typing import List
 
-from ..analysis.analyzer import AccuracyAnalyzer
-from ..config import (
+from .analyzer import AccuracyAnalyzer
+from .config import (
     max_frames,
     output_dir, 
     time_step,
     progress_report_interval
 )
-from ..models import Collision
+from .models import Collision
 from .data_loader import DataLoader
 from .detector import CollisionDetector
 from .results import ResultsManager

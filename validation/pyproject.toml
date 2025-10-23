@@ -1,0 +1,13 @@
+[project]
+name = "validation"
+version = "0.1.0"
+description = "A 2D particle simulation with continuous collision detection and CSV output."
+readme = "../README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "numpy>=2.3.4",
+    "pandas>=2.3.3",
+]
+
+[project.scripts]
+validate = "main"

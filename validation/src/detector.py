@@ -3,8 +3,8 @@
 import math
 from typing import Optional
 
-from ..config import collision_tolerance
-from ..models import Collision, Particle
+from .config import collision_tolerance
+from .models import Collision, Particle
 
 
 class CollisionDetector:
