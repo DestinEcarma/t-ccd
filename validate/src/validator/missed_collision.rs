@@ -1,0 +1,53 @@
+use crate::{
+    frame_window::FrameWindow,
+    miscs::EventRow,
+    validator::{StreamingValidator, comp},
+};
+
+pub struct MissedCollision {
+    pub frame: u64,
+    pub i: usize,
+    pub j: usize,
+    pub toi: f32,
+}
+
+impl StreamingValidator {
+    pub(super) fn find_missed_collisions(
+        &self,
+        prev: &FrameWindow,
+        curr: &FrameWindow,
+        events: &[EventRow],
+        dt: f32,
+    ) -> Vec<MissedCollision> {
+        let mut missed = Vec::new();
+        let keys = prev.particles.keys().copied().collect::<Vec<_>>();
+
+        for i in 0..keys.len() {
+            for j in (i + 1)..keys.len() {
+                let i = keys[i];
+                let j = keys[j];
+
+                let p1 = &prev.particles[&i];
+                let p2 = &prev.particles[&j];
+
+                if let Some(toi) = comp::p2p_toi(p1, p2, dt) {
+                    let was_reported = events.iter().any(|e| {
+                        matches!(e, EventRow::Pair { i: ei, j: ej, .. }
+                                 if (*ei == i && *ej == j) || (*ei == j && *ej == i))
+                    });
+
+                    if !was_reported {
+                        missed.push(MissedCollision {
+                            frame: curr.frame,
+                            i,
+                            j,
+                            toi,
+                        });
+                    }
+                }
+            }
+        }
+
+        missed
+    }
+}

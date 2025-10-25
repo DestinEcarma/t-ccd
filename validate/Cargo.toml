@@ -1,0 +1,15 @@
+[package]
+name = "validate"
+edition.workspace = true
+version.workspace = true
+description.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+anyhow = "1.0.100"
+clap = { version = "4.5.50", features = ["derive"] }
+csv = "1.4.0"
+glam = "0.30.8"
+serde = { version = "1.0.228", features = ["derive"] }
+thiserror = "2.0.17"
