@@ -13,8 +13,6 @@ use rayon::ThreadPoolBuilder;
 
 use crate::{cli::Cli, miscs::DetectionType, particle::Particle, solver::Solver};
 
-const SPEED: f32 = 500.0;
-
 struct TCcdSim {
     particles: Vec<Particle>,
     solver: Solver,
@@ -22,6 +20,7 @@ struct TCcdSim {
     _seed: Option<u64>,
     _min_radius: f32,
     _max_radius: f32,
+    _max_velocity: f32,
 }
 
 impl Simulation for TCcdSim {
@@ -41,8 +40,8 @@ impl Simulation for TCcdSim {
                 rng.random_range(-0.9 * hh..0.9 * hh),
             );
             p.velocity = Vec2::new(
-                rng.random_range(-SPEED..SPEED),
-                rng.random_range(-SPEED..SPEED),
+                rng.random_range(-self._max_velocity..self._max_velocity),
+                rng.random_range(-self._max_velocity..self._max_velocity),
             );
 
             if (self._max_radius - self._min_radius).abs() < f32::EPSILON {
@@ -125,6 +124,7 @@ fn main() -> anyhow::Result<()> {
             _seed: cli.seed,
             _min_radius: cli.min_radius,
             _max_radius: cli.max_radius,
+            _max_velocity: cli.max_velocity,
         },
         SimulationConfig {
             fullscreen: cli.fullscreen,

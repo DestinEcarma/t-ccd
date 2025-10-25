@@ -1,4 +1,7 @@
-use std::{fs::File, io::BufWriter};
+use std::{
+    fs::{self, File},
+    io::BufWriter,
+};
 
 use clap::ValueEnum;
 use serde::Serialize;
@@ -39,7 +42,8 @@ impl DetectionType {
     }
 
     fn make_sink(prefix: &str, tag: &str, count: u64) -> CsvSink {
-        CsvSink::new(format!("{prefix}_{tag}_{count}.csv"))
+        fs::create_dir_all("data").expect("create data directory");
+        CsvSink::new(format!("data/{prefix}_{tag}_{count}.csv"))
     }
 }
 
@@ -107,7 +111,19 @@ impl Recorder {
 
     pub fn write_event_pair(
         &mut self,
-        (toi, i, j, nx, ny, vrel_n_before, vrel_n_after): (f32, usize, usize, f32, f32, f32, f32),
+        (toi, i, j, ix, iy, jx, jy, nx, ny, vrel_n_before, vrel_n_after): (
+            f32,
+            usize,
+            usize,
+            f32,
+            f32,
+            f32,
+            f32,
+            f32,
+            f32,
+            f32,
+            f32,
+        ),
     ) {
         if let Some(ew) = &mut self.events_csv
             && let Err(e) = ew.writer_mut().serialize(EventRow::Pair {
@@ -116,6 +132,10 @@ impl Recorder {
                 toi,
                 i,
                 j,
+                ix,
+                iy,
+                jx,
+                jy,
                 nx,
                 ny,
                 vrel_n_before,
@@ -128,7 +148,17 @@ impl Recorder {
 
     pub fn write_event_wall(
         &mut self,
-        (toi, i, wall, nx, ny, vn_before, vn_after): (f32, usize, &'static str, f32, f32, f32, f32),
+        (toi, i, wall, x, y, nx, ny, vn_before, vn_after): (
+            f32,
+            usize,
+            &'static str,
+            f32,
+            f32,
+            f32,
+            f32,
+            f32,
+            f32,
+        ),
     ) {
         if let Some(ew) = &mut self.events_csv
             && let Err(e) = ew.writer_mut().serialize(EventRow::Wall {
@@ -137,6 +167,10 @@ impl Recorder {
                 toi,
                 i,
                 wall,
+                x,
+                y,
+                jx: None,
+                jy: None,
                 nx,
                 ny,
                 vn_before,
@@ -224,6 +258,10 @@ pub enum EventRow {
         toi: f32,
         i: usize,
         j: usize,
+        ix: f32,
+        iy: f32,
+        jx: f32,
+        jy: f32,
         nx: f32,
         ny: f32,
         vrel_n_before: f32,
@@ -235,6 +273,10 @@ pub enum EventRow {
         toi: f32,
         i: usize,
         wall: &'static str,
+        x: f32,
+        y: f32,
+        jx: Option<f32>,
+        jy: Option<f32>,
         nx: f32,
         ny: f32,
         vn_before: f32,

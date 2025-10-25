@@ -40,4 +40,8 @@ pub struct Cli {
     /// Max radius of particles
     #[arg(short = 'M', long, default_value_t = 10.0)]
     pub max_radius: f32,
+
+    /// Max velocity of particles
+    #[arg(short = 'v', long, default_value_t = 500.0)]
+    pub max_velocity: f32,
 }
