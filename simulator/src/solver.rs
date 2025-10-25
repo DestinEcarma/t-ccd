@@ -125,6 +125,10 @@ impl Solver {
                     toi.time,
                     i,
                     j,
+                    particles[i].position.x,
+                    particles[i].position.y,
+                    particles[j].position.x,
+                    particles[j].position.y,
                     n_hat.x,
                     n_hat.y,
                     v_rel_n,
@@ -177,8 +181,17 @@ impl Solver {
                     "top"
                 };
 
-                self.recorder
-                    .write_event_wall((toi.time, i, wall, n.x, n.y, vn_before, vn_after));
+                self.recorder.write_event_wall((
+                    toi.time,
+                    i,
+                    wall,
+                    p.position.x,
+                    p.position.y,
+                    n.x,
+                    n.y,
+                    vn_before,
+                    vn_after,
+                ));
             }
         }
     }
