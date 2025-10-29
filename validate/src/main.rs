@@ -45,5 +45,9 @@ fn main() -> Result<()> {
 
     result.summary();
 
+    if let Some(output) = &cli.output {
+        result.write_to_csv(output)?;
+    }
+
     Ok(())
 }

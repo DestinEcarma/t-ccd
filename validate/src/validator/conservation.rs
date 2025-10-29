@@ -1,14 +1,17 @@
+use serde::Serialize;
+
 use crate::{
     frame_window::FrameWindow,
     miscs::ParticleState,
     validator::{StreamingValidator, comp, report::ValidationReport},
 };
 
+#[derive(Serialize)]
 pub struct ConservationViolation {
-    frame: u64,
-    energy_error: f32,
-    x_error: f32,
-    y_error: f32,
+    pub frame: u64,
+    pub energy_error: f32,
+    pub x_error: f32,
+    pub y_error: f32,
 }
 
 impl StreamingValidator {
@@ -25,7 +28,7 @@ impl StreamingValidator {
         let px_error = ((px_curr - px_prev) / px_prev.abs().max(1e-6)).abs();
         let py_error = ((py_curr - py_prev) / py_prev.abs().max(1e-6)).abs();
 
-        if energy_error > 1e-4 || px_error > 1e-4 || py_error > 1e-4 {
+        if energy_error > self.tolerance || px_error > self.tolerance || py_error > self.tolerance {
             report.conservation_violations.push(ConservationViolation {
                 frame: curr.frame,
                 energy_error,

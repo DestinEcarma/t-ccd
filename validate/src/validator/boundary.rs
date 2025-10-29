@@ -1,15 +1,18 @@
+use serde::Serialize;
+
 use crate::{
     boundary::Boundary,
     frame_window::FrameWindow,
     validator::{StreamingValidator, report::ValidationReport},
 };
 
+#[derive(Serialize)]
 pub struct BoundaryViolation {
-    frame: u64,
-    id: usize,
-    x: f32,
-    y: f32,
-    radius: f32,
+    pub frame: u64,
+    pub id: usize,
+    pub x: f32,
+    pub y: f32,
+    pub radius: f32,
 }
 
 impl StreamingValidator {
