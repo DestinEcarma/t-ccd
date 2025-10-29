@@ -1,13 +1,20 @@
+use serde::Serialize;
+
 use crate::{
     frame_window::FrameWindow,
     miscs::EventRow,
     validator::{StreamingValidator, comp},
 };
 
+#[derive(Serialize)]
 pub struct MissedCollision {
     pub frame: u64,
     pub i: usize,
     pub j: usize,
+    pub ix: f32,
+    pub iy: f32,
+    pub jx: f32,
+    pub jy: f32,
     pub toi: f32,
 }
 
@@ -41,6 +48,10 @@ impl StreamingValidator {
                             frame: curr.frame,
                             i,
                             j,
+                            ix: p1.position.x,
+                            iy: p1.position.y,
+                            jx: p2.position.x,
+                            jy: p2.position.y,
                             toi,
                         });
                     }

@@ -21,6 +21,10 @@ pub struct Cli {
     pub tolerance: f32,
 
     /// Size: 800x400
-    #[arg(short, long, default_value = "800x400")]
+    #[arg(short, long, default_value = "800x600")]
     pub size: String,
+
+    /// Directory to save output files, if not set output `csv` files will not be generated
+    #[arg(short, long)]
+    pub output: Option<PathBuf>,
 }

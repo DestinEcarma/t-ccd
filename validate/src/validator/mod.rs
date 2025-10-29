@@ -18,7 +18,7 @@ use crate::{
     buffered_reader::{BufferedEventReader, BufferedParticleReader},
     frame_window::FrameWindow,
     miscs::{EventRow, ParticleRow, ParticleState},
-    validator::{error::ValidationError, report::ValidationReport},
+    validator::{error::ValidationError, event::FalsePositive, report::ValidationReport},
 };
 
 #[derive(Default)]
@@ -114,7 +114,9 @@ impl StreamingValidator {
     ) {
         for event in events {
             if let Err(e) = self.validate_event(event, prev_window) {
-                report.false_positives.push((curr_window.frame, e));
+                report
+                    .false_positives
+                    .push(FalsePositive::new(prev_window.frame, e));
             } else {
                 report.valid_collisions += 1;
             }
