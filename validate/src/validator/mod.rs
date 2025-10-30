@@ -53,52 +53,53 @@ impl StreamingValidator {
         let mut particle_stream = BufferedParticleReader::new(Reader::from_path(particles_csv)?);
         let mut event_stream = BufferedEventReader::new(Reader::from_path(events_csv)?);
 
-        let mut prev_window = particle_stream.read_frame(1)?;
+        let mut curr_window = particle_stream.read_frame(1)?;
 
-        if !prev_window.particles.is_empty() {
+        if !curr_window.particles.is_empty() {
             println!(
                 "Particles loaded with length {0} at the first frame",
-                prev_window.particles.len()
+                curr_window.particles.len()
             );
         } else {
             bail!("No particles found at the first frame");
         }
 
-        let mut frame = 2;
+        let mut frame = 1;
 
         let mut report = ValidationReport::default();
 
-        self.check_initial_overlaps(&prev_window, &mut report);
+        self.check_initial_overlaps(&curr_window, &mut report);
 
         while frame <= self.max_frame {
-            let curr_window = particle_stream.read_frame(frame)?;
+            let next_window = particle_stream.read_frame(frame + 1)?;
 
-            if curr_window.particles.is_empty() {
+            if next_window.particles.is_empty() {
                 println!("No more particles found at frame {frame}");
-                self.max_frame = frame - 1;
+                self.max_frame = frame;
                 println!("Setting max frames to {}", self.max_frame);
                 break;
             }
 
-            let dt = curr_window.time_s - prev_window.time_s;
+            let dt = next_window.time_s - curr_window.time_s;
 
             println!(
                 "Processing frame {} / {} ({:.2}%) (t={:.6}s, dt={:.6}s)",
                 frame,
                 self.max_frame,
                 frame / self.max_frame * 100,
-                curr_window.time_s,
+                next_window.time_s,
                 dt,
             );
 
             let events = event_stream.read_frame(frame)?;
 
-            self.validate_frame(&prev_window, &curr_window, &events, dt, &mut report);
+            self.validate_frame(&curr_window, &next_window, &events, dt, &mut report);
 
-            prev_window = curr_window;
+            curr_window = next_window;
             frame += 1;
         }
-        println!("\nValidation complete! Processed {} frames", frame - 1);
+
+        println!("\nValidation complete! Processed {frame} frames");
         println!("{report}");
 
         Ok(report)
@@ -106,30 +107,27 @@ impl StreamingValidator {
 
     fn validate_frame(
         &self,
-        prev_window: &FrameWindow,
-        curr_window: &FrameWindow,
+        curr: &FrameWindow,
+        next: &FrameWindow,
         events: &[EventRow],
         dt: f32,
         report: &mut ValidationReport,
     ) {
         for event in events {
-            if let Err(e) = self.validate_event(event, prev_window) {
+            if let Err(e) = self.validate_event(event, curr) {
                 report
                     .false_positives
-                    .push(FalsePositive::new(prev_window.frame, e));
+                    .push(FalsePositive::new(curr.frame, e));
             } else {
                 report.valid_collisions += 1;
             }
         }
 
-        report.missed_collisions.extend(self.find_missed_collisions(
-            prev_window,
-            curr_window,
-            events,
-            dt,
-        ));
+        report
+            .missed_collisions
+            .extend(self.find_missed_collisions(curr, next, events, dt));
 
-        self.check_boundaries(curr_window, report);
-        self.check_conservation(prev_window, curr_window, report);
+        self.check_boundaries(next, report);
+        self.check_conservation(curr, next, report);
     }
 }

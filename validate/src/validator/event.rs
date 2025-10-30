@@ -1,5 +1,5 @@
 use glam::Vec2;
-use serde::Serialize;
+use serde::{Serialize, Serializer};
 
 use crate::{
     frame_window::FrameWindow,
@@ -10,7 +10,15 @@ use crate::{
 #[derive(Serialize)]
 pub struct FalsePositive {
     pub frame: u64,
+    #[serde(serialize_with = "serialize_error_as_json")]
     pub error: ValidationError,
+}
+
+fn serialize_error_as_json<S>(error: &ValidationError, serializer: S) -> Result<S::Ok, S::Error>
+where
+    S: Serializer,
+{
+    serializer.serialize_str(&serde_json::to_string(error).map_err(serde::ser::Error::custom)?)
 }
 
 impl FalsePositive {

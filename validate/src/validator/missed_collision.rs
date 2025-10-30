@@ -21,21 +21,21 @@ pub struct MissedCollision {
 impl StreamingValidator {
     pub(super) fn find_missed_collisions(
         &self,
-        prev: &FrameWindow,
         curr: &FrameWindow,
+        next: &FrameWindow,
         events: &[EventRow],
         dt: f32,
     ) -> Vec<MissedCollision> {
         let mut missed = Vec::new();
-        let keys = prev.particles.keys().copied().collect::<Vec<_>>();
+        let keys = curr.particles.keys().copied().collect::<Vec<_>>();
 
         for i in 0..keys.len() {
             for j in (i + 1)..keys.len() {
                 let i = keys[i];
                 let j = keys[j];
 
-                let p1 = &prev.particles[&i];
-                let p2 = &prev.particles[&j];
+                let p1 = &curr.particles[&i];
+                let p2 = &curr.particles[&j];
 
                 if let Some(toi) = comp::p2p_toi(p1, p2, dt) {
                     let was_reported = events.iter().any(|e| {
@@ -45,7 +45,7 @@ impl StreamingValidator {
 
                     if !was_reported {
                         missed.push(MissedCollision {
-                            frame: curr.frame,
+                            frame: next.frame,
                             i,
                             j,
                             ix: p1.position.x,

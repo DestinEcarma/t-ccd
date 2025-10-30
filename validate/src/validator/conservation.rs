@@ -17,12 +17,12 @@ pub struct ConservationViolation {
 impl StreamingValidator {
     pub(super) fn check_conservation(
         &self,
-        prev: &FrameWindow,
         curr: &FrameWindow,
+        next: &FrameWindow,
         report: &mut ValidationReport,
     ) {
-        let (ke_prev, px_prev, py_prev) = comp::compute_totals(&prev.particles);
-        let (ke_curr, px_curr, py_curr) = comp::compute_totals(&curr.particles);
+        let (ke_prev, px_prev, py_prev) = comp::compute_totals(&curr.particles);
+        let (ke_curr, px_curr, py_curr) = comp::compute_totals(&next.particles);
 
         let energy_error = ((ke_curr - ke_prev) / ke_prev).abs();
         let px_error = ((px_curr - px_prev) / px_prev.abs().max(1e-6)).abs();
@@ -30,7 +30,7 @@ impl StreamingValidator {
 
         if energy_error > self.tolerance || px_error > self.tolerance || py_error > self.tolerance {
             report.conservation_violations.push(ConservationViolation {
-                frame: curr.frame,
+                frame: next.frame,
                 energy_error,
                 x_error: px_error,
                 y_error: py_error,
