@@ -44,11 +44,11 @@ impl StreamingValidator {
                 let pi = window
                     .particles
                     .get(i)
-                    .ok_or(ValidationError::ParticleNotFound(*i))?;
+                    .ok_or(ValidationError::ParticleNotFound { i: *i })?;
                 let pj = window
                     .particles
                     .get(j)
-                    .ok_or(ValidationError::ParticleNotFound(*j))?;
+                    .ok_or(ValidationError::ParticleNotFound { i: *j })?;
 
                 let i_pos = Vec2::new(*ix, *iy);
                 let j_pos = Vec2::new(*jx, *jy);
