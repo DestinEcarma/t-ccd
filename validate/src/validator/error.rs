@@ -1,9 +1,10 @@
 use serde::Serialize;
 
 #[derive(Debug, Serialize, thiserror::Error)]
+#[serde(tag = "type", rename_all = "snake_case")]
 pub enum ValidationError {
-    #[error("Particle not found at index {0}")]
-    ParticleNotFound(usize),
+    #[error("Particle not found at index {i}")]
+    ParticleNotFound { i: usize },
     #[error("Particles are not touching")]
     NotTouching {
         i: usize,
