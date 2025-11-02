@@ -20,7 +20,7 @@ pub struct Cli {
     #[arg(short, long, default_value_t = 1e-5)]
     pub tolerance: f32,
 
-    /// Size: 800x400
+    /// The size of the boundary
     #[arg(short, long, default_value = "800x600")]
     pub size: String,
 
