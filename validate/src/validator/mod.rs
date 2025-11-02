@@ -93,7 +93,7 @@ impl StreamingValidator {
 
             let events = event_stream.read_frame(frame)?;
 
-            self.validate_frame(&curr_window, &next_window, &events, dt, &mut report);
+            self.validate_frame(&mut curr_window, &next_window, &events, dt, &mut report);
 
             curr_window = next_window;
             frame += 1;
@@ -106,7 +106,7 @@ impl StreamingValidator {
 
     fn validate_frame(
         &self,
-        curr: &FrameWindow,
+        curr: &mut FrameWindow,
         next: &FrameWindow,
         events: &[EventRow],
         dt: f32,
@@ -124,7 +124,7 @@ impl StreamingValidator {
 
         report
             .missed_collisions
-            .extend(self.find_missed_collisions(curr, next, events, dt));
+            .extend(self.find_missed_collisions(curr, events, dt));
 
         self.check_boundaries(next, report);
         self.check_conservation(curr, next, report);

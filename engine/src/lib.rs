@@ -125,9 +125,12 @@ pub fn run_with<S: Simulation + 'static>(sim: S, config: SimulationConfig) -> an
                     renderer.resize(new_size);
                 }
                 WindowEvent::RedrawRequested => {
-                    log::info!("FPS: {}", 1.0 / (self.last_frame.elapsed().as_secs_f32()));
-
                     let PhysicalSize { width, height } = window.inner_size();
+
+                    log::info!(
+                        "FPS: {} (size={width}x{height})",
+                        1.0 / (self.last_frame.elapsed().as_secs_f32()),
+                    );
 
                     if width == 0 || height == 0 {
                         return;

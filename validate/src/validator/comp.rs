@@ -38,7 +38,7 @@ pub fn p2p_toi(p1: &ParticleState, p2: &ParticleState, dt: f32) -> Option<f32> {
     }
 }
 
-fn boundary_toi(p: &ParticleState, boundary: &Boundary, dt: f32) -> Option<f32> {
+pub fn boundary_toi(p: &ParticleState, boundary: &Boundary, dt: f32) -> Option<f32> {
     let pos = p.position;
     let vel = p.velocity;
     let r = p.radius;

@@ -111,8 +111,9 @@ impl Recorder {
 
     pub fn write_event_pair(
         &mut self,
-        (toi, i, j, ix, iy, jx, jy, nx, ny, vrel_n_before, vrel_n_after): (
+        (toi, iter, i, j, ix, iy, jx, jy, nx, ny, vrel_n_before, vrel_n_after): (
             f32,
+            usize,
             usize,
             usize,
             f32,
@@ -130,6 +131,7 @@ impl Recorder {
                 frame: self.frame,
                 time_s: self.time_s + toi,
                 toi,
+                iter,
                 i,
                 j,
                 ix,
@@ -148,8 +150,9 @@ impl Recorder {
 
     pub fn write_event_wall(
         &mut self,
-        (toi, i, wall, x, y, nx, ny, vn_before, vn_after): (
+        (toi, iter, i, wall, x, y, nx, ny, vn_before, vn_after): (
             f32,
+            usize,
             usize,
             &'static str,
             f32,
@@ -165,6 +168,7 @@ impl Recorder {
                 frame: self.frame,
                 time_s: self.time_s + toi,
                 toi,
+                iter,
                 i,
                 wall,
                 x,
@@ -256,6 +260,7 @@ pub enum EventRow {
         frame: u64,
         time_s: f32,
         toi: f32,
+        iter: usize,
         i: usize,
         j: usize,
         ix: f32,
@@ -271,6 +276,7 @@ pub enum EventRow {
         frame: u64,
         time_s: f32,
         toi: f32,
+        iter: usize,
         i: usize,
         wall: &'static str,
         x: f32,
