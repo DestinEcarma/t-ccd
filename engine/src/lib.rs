@@ -59,6 +59,7 @@ pub fn run_with<S: Simulation + 'static>(sim: S, config: SimulationConfig) -> an
             if let Ok(window) = event_loop.create_window(
                 WindowAttributes::default()
                     .with_title("Particle Simulation")
+                    .with_resizable(false)
                     .with_inner_size(
                         if self.config.fullscreen
                             && let Some(monitor) = monitors.first()
