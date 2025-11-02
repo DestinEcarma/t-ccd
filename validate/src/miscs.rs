@@ -50,6 +50,7 @@ pub enum EventRow {
         frame: u64,
         time_s: f32,
         toi: f32,
+        iter: usize,
         i: usize,
         j: usize,
         ix: f32,
@@ -65,6 +66,7 @@ pub enum EventRow {
         frame: u64,
         time_s: f32,
         toi: f32,
+        iter: usize,
         i: usize,
         wall: String,
         x: f32,
@@ -98,6 +100,7 @@ impl<'de> Deserialize<'de> for EventRow {
                 let mut frame = None::<u64>;
                 let mut time_s = None::<f32>;
                 let mut toi = None::<f32>;
+                let mut iter = None::<usize>;
                 let mut i = None::<usize>;
                 let mut j = None::<usize>;
                 let mut wall = None::<String>;
@@ -118,6 +121,7 @@ impl<'de> Deserialize<'de> for EventRow {
                         "frame" => frame = Some(map.next_value()?),
                         "time_s" => time_s = Some(map.next_value()?),
                         "toi" => toi = Some(map.next_value()?),
+                        "iter" => iter = Some(map.next_value()?),
                         "i" => i = Some(map.next_value()?),
                         "j" => {
                             if let Some(type_) = &type_ {
@@ -187,6 +191,7 @@ impl<'de> Deserialize<'de> for EventRow {
                 let frame = frame.ok_or_else(|| de::Error::missing_field("frame"))?;
                 let time_s = time_s.ok_or_else(|| de::Error::missing_field("time_s"))?;
                 let toi = toi.ok_or_else(|| de::Error::missing_field("toi"))?;
+                let iter = iter.ok_or_else(|| de::Error::missing_field("iter"))?;
                 let i = i.ok_or_else(|| de::Error::missing_field("i"))?;
                 let ix = ix.ok_or_else(|| de::Error::missing_field("ix"))?;
                 let iy = iy.ok_or_else(|| de::Error::missing_field("iy"))?;
@@ -201,6 +206,7 @@ impl<'de> Deserialize<'de> for EventRow {
                         frame,
                         time_s,
                         toi,
+                        iter,
                         i,
                         j: j.ok_or_else(|| de::Error::missing_field("j"))?,
                         ix,
@@ -216,6 +222,7 @@ impl<'de> Deserialize<'de> for EventRow {
                         frame,
                         time_s,
                         toi,
+                        iter,
                         i,
                         wall: wall.ok_or_else(|| de::Error::missing_field("wall"))?,
                         x: ix,

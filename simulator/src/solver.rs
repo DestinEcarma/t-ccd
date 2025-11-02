@@ -73,7 +73,7 @@ impl Solver {
             match min_toi {
                 Some((toi, checks)) => {
                     Self::advance_all(particles, toi.time);
-                    self.resolve_collision(particles, bounds, toi);
+                    self.resolve_collision(particles, bounds, toi, i);
 
                     dt -= toi.time;
 
@@ -93,7 +93,13 @@ impl Solver {
         self.grid.set_max_radius(r);
     }
 
-    fn resolve_collision(&mut self, particles: &mut [Particle], bounds: &Bounds, toi: Toi) {
+    fn resolve_collision(
+        &mut self,
+        particles: &mut [Particle],
+        bounds: &Bounds,
+        toi: Toi,
+        iter: usize,
+    ) {
         match toi.collision {
             Collision::Pair(i, j) => {
                 let p1 = &particles[i];
@@ -123,6 +129,7 @@ impl Solver {
 
                 self.recorder.write_event_pair((
                     toi.time,
+                    iter,
                     i,
                     j,
                     particles[i].position.x,
@@ -183,6 +190,7 @@ impl Solver {
 
                 self.recorder.write_event_wall((
                     toi.time,
+                    iter,
                     i,
                     wall,
                     p.position.x,

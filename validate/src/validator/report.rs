@@ -54,10 +54,16 @@ impl ValidationReport {
         if !self.missed_collisions.is_empty() {
             println!("\nFirst 10 missed collisions:");
             for mc in self.missed_collisions.iter().take(10) {
-                println!(
-                    "  Frame {}: particles {} ↔ {} at t={:.6}s",
-                    mc.frame, mc.i, mc.j, mc.toi
-                );
+                match mc {
+                    MissedCollision::Pair {
+                        frame, toi, i, j, ..
+                    } => {
+                        println!("  Frame {frame}: particles {i} ↔ {j} at t={toi:.6}s")
+                    }
+                    MissedCollision::Wall { frame, toi, i, .. } => {
+                        println!("  Frame {frame}: particle {i} wall collision at t={toi:.6}s")
+                    }
+                }
             }
         }
 
