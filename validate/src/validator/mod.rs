@@ -100,7 +100,6 @@ impl StreamingValidator {
         }
 
         println!("\nValidation complete! Processed {frame} frames");
-        println!("{report}");
 
         Ok(report)
     }

@@ -28,7 +28,8 @@ impl fmt::Display for ValidationReport {
         writeln!(f, "Valid collisions: {}", self.valid_collisions);
         writeln!(f, "False positives: {}", self.false_positives.len());
         writeln!(f, "Missed collisions: {}", self.missed_collisions.len());
-        println!(
+        writeln!(
+            f,
             "Conservation violations: {}",
             self.conservation_violations.len()
         );
@@ -41,8 +42,8 @@ impl ValidationReport {
         println!("{self}");
 
         if !self.initial_overlaps.is_empty() {
-            println!("\nInitial overlaps:");
-            for overlap in &self.initial_overlaps {
+            println!("\nFirst 10 initial overlaps:");
+            for overlap in self.initial_overlaps.iter().take(10) {
                 println!(
                     "  Frame {}: particles {} ↔ {} overlap (dist={:.4}, min={:.4})",
                     overlap.frame, overlap.i, overlap.j, overlap.dist, overlap.min_dist
