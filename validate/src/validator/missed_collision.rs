@@ -30,6 +30,9 @@ pub enum MissedCollision {
         i: usize,
         x: f32,
         y: f32,
+        _j: Option<usize>,
+        _x: Option<f32>,
+        _y: Option<f32>,
     },
 }
 
@@ -120,8 +123,6 @@ impl StreamingValidator {
             }
 
             if let Some((toi, was_reported)) = min_toi {
-                // println!("Was reported: {was_reported} ({toi:?})");
-
                 if (!was_reported) {
                     match toi.collision {
                         Collision::Pair(i, j) => {
@@ -150,6 +151,9 @@ impl StreamingValidator {
                                 i,
                                 x: p.position.x,
                                 y: p.position.y,
+                                _j: None,
+                                _x: None,
+                                _y: None,
                             });
                         }
                     }
