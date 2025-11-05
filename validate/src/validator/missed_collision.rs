@@ -30,6 +30,9 @@ pub enum MissedCollision {
         i: usize,
         x: f32,
         y: f32,
+        _j: Option<usize>,
+        _x: Option<f32>,
+        _y: Option<f32>,
     },
 }
 
@@ -148,6 +151,9 @@ impl StreamingValidator {
                                 i,
                                 x: p.position.x,
                                 y: p.position.y,
+                                _j: None,
+                                _x: None,
+                                _y: None,
                             });
                         }
                     }
