@@ -118,7 +118,7 @@ impl StreamingValidator {
                     .false_positives
                     .push(FalsePositive::new(curr.frame, e));
             } else {
-                report.valid_collisions += 1;
+                report.true_positives.push(event.clone())
             }
         }
 

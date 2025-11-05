@@ -6,15 +6,18 @@ use std::{
 use anyhow::Result;
 use csv::Writer;
 
-use crate::validator::{
-    boundary::BoundaryViolation, conservation::ConservationViolation, error::ValidationError,
-    event::FalsePositive, missed_collision::MissedCollision, overlaps::OverlapViolation,
+use crate::{
+    miscs::EventRow,
+    validator::{
+        boundary::BoundaryViolation, conservation::ConservationViolation, error::ValidationError,
+        event::FalsePositive, missed_collision::MissedCollision, overlaps::OverlapViolation,
+    },
 };
 
 #[derive(Default)]
 pub struct ValidationReport {
     pub initial_overlaps: Vec<OverlapViolation>,
-    pub valid_collisions: usize,
+    pub true_positives: Vec<EventRow>,
     pub false_positives: Vec<FalsePositive>,
     pub missed_collisions: Vec<MissedCollision>,
     pub conservation_violations: Vec<ConservationViolation>,
@@ -25,7 +28,7 @@ impl fmt::Display for ValidationReport {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         writeln!(f, "\n=== VALIDATION REPORT ===");
         writeln!(f, "Initial overlaps: {}", self.initial_overlaps.len());
-        writeln!(f, "Valid collisions: {}", self.valid_collisions);
+        writeln!(f, "True positives: {}", self.true_positives.len());
         writeln!(f, "False positives: {}", self.false_positives.len());
         writeln!(f, "Missed collisions: {}", self.missed_collisions.len());
         writeln!(
@@ -101,6 +104,16 @@ impl ValidationReport {
 
             for overlap in &self.initial_overlaps {
                 writer.serialize(overlap)?;
+            }
+
+            writer.flush()?;
+        }
+
+        if !self.true_positives.is_empty() {
+            let mut writer = Writer::from_path(base_path.clone().join("true_positives.csv"))?;
+
+            for tp in &self.true_positives {
+                writer.serialize(tp)?;
             }
 
             writer.flush()?;
