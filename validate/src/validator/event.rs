@@ -110,7 +110,6 @@ impl StreamingValidator {
                         expected: expected_after,
                     });
                 }
-                Ok(())
             }
             EventRow::Wall {
                 frame,
@@ -136,8 +135,9 @@ impl StreamingValidator {
                         jy: None,
                     });
                 }
-                Ok(())
             }
         }
+
+        Ok(())
     }
 }

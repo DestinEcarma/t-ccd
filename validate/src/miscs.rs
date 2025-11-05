@@ -2,7 +2,7 @@ use std::fmt;
 
 use glam::Vec2;
 use serde::{
-    Deserialize, Deserializer,
+    Deserialize, Deserializer, Serialize,
     de::{self, MapAccess, Visitor},
 };
 
@@ -44,7 +44,8 @@ pub struct ParticleRow {
     pub mass: f32,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize, Clone)]
+#[serde(tag = "type")]
 pub enum EventRow {
     Pair {
         frame: u64,
@@ -71,6 +72,8 @@ pub enum EventRow {
         wall: String,
         x: f32,
         y: f32,
+        _x: Option<f32>,
+        _y: Option<f32>,
         nx: f32,
         ny: f32,
         vn_before: f32,
@@ -227,6 +230,8 @@ impl<'de> Deserialize<'de> for EventRow {
                         wall: wall.ok_or_else(|| de::Error::missing_field("wall"))?,
                         x: ix,
                         y: iy,
+                        _x: None,
+                        _y: None,
                         nx,
                         ny,
                         vn_before,
