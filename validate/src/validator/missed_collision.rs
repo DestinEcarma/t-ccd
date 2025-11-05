@@ -83,7 +83,7 @@ impl StreamingValidator {
 
                     let p2 = &window.particles[&j];
 
-                    if let Some(t) = comp::p2p_toi(p1, p2, dt) {
+                    if let Some(t) = comp::p2p_toi(p1, p2, dt, self.tolerance) {
                         let toi = events.iter().find(|e| {
                             matches!(e, EventRow::Pair { frame, iter: eiter, i: ei, j: ej, .. }
                                 if *frame == window.frame && ((*ei == i && *ej == j) || (*ei == j && *ej == i)))

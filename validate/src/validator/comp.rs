@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use crate::{boundary::Boundary, miscs::ParticleState};
 
-pub fn p2p_toi(p1: &ParticleState, p2: &ParticleState, dt: f32) -> Option<f32> {
+pub fn p2p_toi(p1: &ParticleState, p2: &ParticleState, dt: f32, tolerance: f32) -> Option<f32> {
     let dp = p2.position - p1.position;
     let dv = p2.velocity - p1.velocity;
     let r = p1.radius + p2.radius;
@@ -15,7 +15,7 @@ pub fn p2p_toi(p1: &ParticleState, p2: &ParticleState, dt: f32) -> Option<f32> {
         return None;
     }
 
-    if a <= 1e-12 {
+    if a <= tolerance {
         return None;
     }
 
