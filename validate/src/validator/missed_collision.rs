@@ -120,8 +120,6 @@ impl StreamingValidator {
             }
 
             if let Some((toi, was_reported)) = min_toi {
-                // println!("Was reported: {was_reported} ({toi:?})");
-
                 if (!was_reported) {
                     match toi.collision {
                         Collision::Pair(i, j) => {
