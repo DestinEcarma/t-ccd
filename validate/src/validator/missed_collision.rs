@@ -159,9 +159,13 @@ impl StreamingValidator {
                     }
                 }
 
+                Self::advance_all(window, toi.time);
                 self.resolve_collision(window, &toi);
 
                 dt -= toi.time;
+            } else {
+                Self::advance_all(window, dt);
+                break;
             }
         }
 
@@ -226,6 +230,12 @@ impl StreamingValidator {
                     p.velocity.y *= -1.0;
                 }
             }
+        }
+    }
+
+    fn advance_all(window: &mut FrameWindow, dt: f32) {
+        for particle in window.particles.values_mut() {
+            particle.position += particle.velocity * dt;
         }
     }
 }
